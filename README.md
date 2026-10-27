@@ -86,6 +86,18 @@ instalação automática com UI de progresso + scripts) — ver
 [`progress.md`](progress.md) para o detalhe do que falta (build em dispositivo
 e validação em aparelho).
 
+## Integração contínua
+
+O pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda em
+cada push para `main`/`updates` e em cada pull request:
+
+1. `flutter pub get` — dependências (Flutter 3.47.8 fixado);
+2. `flutter analyze` — falha o pipeline em **qualquer** problema;
+3. `flutter test` — suíte completa (37 testes: extratores, cascata do
+   orquestrador, instalação da LLM, PDF, pipeline de voz e smoke test).
+
+Assim nenhuma quebra de comportamento chega à `main` sem ser detectada.
+
 ## Roadmap (PRD Seção 3)
 
 1. **Etapa 1 — Diário de Obra por Voz**: transcrição offline → entidades → RDO em PDF.

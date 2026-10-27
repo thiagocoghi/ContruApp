@@ -1,0 +1,39 @@
+# Pipeline de CI — impede que quebras cheguem às branches protegidas.
+#
+# Roda `flutter analyze` (falha em qualquer problema) e `flutter test`
+# (suíte completa: extratores, cascata do orquestrador, instalação da LLM,
+# PDF, pipeline de voz e smoke test).
+name: CI
+
+on:
+  push:
+    branches: [main, updates]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  analise-e-testes:
+    name: analyze + test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Mesma versão usada no desenvolvimento local (Flutter 3.47.8 /
+      # Dart 3.13.7) — o llamadart exige Dart >= 3.10.7.
+      - name: Flutter 3.47.8 (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.8
+          channel: stable
+          cache: true
+
+      - name: Dependências
+        run: flutter pub get
+
+      - name: Análise estática
+        run: flutter analyze
+
+      - name: Testes
+        run: flutter test
