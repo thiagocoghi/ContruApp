@@ -1,0 +1,32 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Android / iOS (gerados por `flutter create .`)
+android/.gradle/
+ios/Pods/
+ios/.symlinks/
+
+# Modelos de IA (~2,5 GB) — nunca versionar
+# APK gerado na raiz (cópia de conveniência do build/release)
+/*.apk
+
+assets/modelos/**/*.gguf
+assets/modelos/**/*.bin
+assets/modelos/**/*.tflite
+assets/modelos/**/*.onnx
+
+# Saídas locais
+*.log
+
+# Estado da ferramenta de IA (não é código do projeto
+.freebuff/
