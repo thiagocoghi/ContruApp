@@ -20,7 +20,11 @@ class TelaDiarios extends StatelessWidget {
         repositorio: RegistrarDependencias.instancia.diarios,
         obraId: obra.id,
       )..carregar(),
-      child: Scaffold(
+      // Builder desce o contexto para baixo do BlocProvider: sem ele, o
+      // callback do FAB capturaria o contexto de TelaDiarios (acima do
+      // provider) e o `context.read` lançaria exceção em runtime.
+      child: Builder(
+        builder: (context) => Scaffold(
         appBar: AppBar(title: Text(obra.nome)),
         body: BlocBuilder<DiariosCubit, EstadoDiarios>(
           builder: (context, estado) {
@@ -59,7 +63,7 @@ class TelaDiarios extends StatelessWidget {
                   itemCount: estado.diarios.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, i) =>
-                      _CardDiario(diario: estado.diarios[i], obra: obra),
+                    _CardDiario(diario: estado.diarios[i], obra: obra),
                 );
             }
           },
@@ -67,10 +71,15 @@ class TelaDiarios extends StatelessWidget {
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             await Navigator.pushNamed(context, '/diario/nova', arguments: obra);
+            // Volta da gravação: novo RDO pode ter entrado.
+            if (context.mounted) {
+              context.read<DiariosCubit>().carregar();
+            }
           },
           icon: const Icon(Icons.mic_outlined),
           label: const Text('Novo diário por voz'),
         ),
+      ),
       ),
     );
   }
@@ -100,11 +109,18 @@ class _CardDiario extends StatelessWidget {
           if (diario.pdfPath != null) 'PDF gerado ✓',
         ].join('\n')),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () => Navigator.pushNamed(
-          context,
-          '/diario/detalhe',
-          arguments: (obra: obra, diario: diario),
-        ),
+        onTap: () async {
+          // `true` volta da tela de detalhe quando o RDO foi excluído ou a
+          // transcrição corrigida — aí a lista precisa ser recarregada.
+          final alterado = await Navigator.pushNamed(
+            context,
+            '/diario/detalhe',
+            arguments: (obra: obra, diario: diario),
+          );
+          if (alterado == true && context.mounted) {
+            context.read<DiariosCubit>().carregar();
+          }
+        },
       ),
     );
   }

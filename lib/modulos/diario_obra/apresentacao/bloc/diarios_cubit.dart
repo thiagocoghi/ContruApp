@@ -50,4 +50,41 @@ class DiariosCubit extends Cubit<EstadoDiarios> {
       ));
     }
   }
+
+  /// Corrige a transcrição editada pelo engenheiro, mantendo os campos já
+  /// extraídos (clima, efetivo, materiais...) como estão.
+  Future<bool> atualizarTranscricao({
+    required DiarioObra diario,
+    required String texto,
+  }) async {
+    final limpo = texto.trim();
+    if (limpo.isEmpty) {
+      emit(const EstadoDiarios.erro('A transcrição não pode ficar vazia.'));
+      return false;
+    }
+    try {
+      await repositorio.atualizarTranscricao(id: diario.id, texto: limpo);
+      await carregar();
+      return true;
+    } on Exception catch (e) {
+      emit(EstadoDiarios.erro(
+        e is FalhaDominio ? e.mensagem : 'Erro ao salvar a transcrição.',
+      ));
+      return false;
+    }
+  }
+
+  /// Apaga o RDO e o PDF gerado a partir dele.
+  Future<bool> excluir(DiarioObra diario) async {
+    try {
+      await repositorio.excluir(diario);
+      await carregar();
+      return true;
+    } on Exception catch (e) {
+      emit(EstadoDiarios.erro(
+        e is FalhaDominio ? e.mensagem : 'Erro ao excluir o diário.',
+      ));
+      return false;
+    }
+  }
 }

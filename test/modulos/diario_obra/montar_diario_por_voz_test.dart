@@ -28,6 +28,14 @@ class _ObraRepositorioMemoria implements ObraRepositorio {
   Future<List<Obra>> listar() async => obras;
 
   @override
+  Future<List<Obra>> listarAtivas() async =>
+      obras.where((o) => o.estaAtiva).toList();
+
+  @override
+  Future<List<Obra>> listarArquivadas() async =>
+      obras.where((o) => !o.estaAtiva).toList();
+
+  @override
   Future<Obra?> porId(String id) async {
     for (final o in obras) {
       if (o.id == id) return o;
@@ -37,6 +45,17 @@ class _ObraRepositorioMemoria implements ObraRepositorio {
 
   @override
   Future<void> salvar(Obra obra) async => obras.add(obra);
+
+  @override
+  Future<void> atualizar(Obra obra) async {
+    final i = obras.indexWhere((o) => o.id == obra.id);
+    if (i >= 0) obras[i] = obra;
+  }
+
+  @override
+  Future<void> excluir(String id) async => obras.removeWhere(
+        (o) => o.id == id,
+      );
 }
 
 void main() {

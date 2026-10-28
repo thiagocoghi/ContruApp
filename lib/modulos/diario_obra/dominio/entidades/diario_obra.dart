@@ -53,11 +53,11 @@ class DiarioObra extends Equatable {
   final List<String> prazos;
   final String? pdfPath;
 
-  DiarioObra copiarCom({String? pdfPath}) => DiarioObra(
+  DiarioObra copiarCom({String? transcricaoRaw, String? pdfPath}) => DiarioObra(
         id: id,
         obraId: obraId,
         data: data,
-        transcricaoRaw: transcricaoRaw,
+        transcricaoRaw: transcricaoRaw ?? this.transcricaoRaw,
         clima: clima,
         efetivo: efetivo,
         materiais: materiais,

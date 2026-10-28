@@ -18,8 +18,9 @@ class ConexaoSqlite {
         caminho ?? p.join(await getDatabasesPath(), 'engin_app.db');
     final db = await openDatabase(
       caminhoBanco,
-      version: 1,
+      version: 2,
       onCreate: criarSchema,
+      onUpgrade: migrar,
     );
     return ConexaoSqlite._(db);
   }
@@ -32,7 +33,10 @@ class ConexaoSqlite {
         nome TEXT NOT NULL,
         cliente TEXT,
         localizacao TEXT,
-        data_inicio TEXT NOT NULL
+        data_inicio TEXT NOT NULL,
+        data_fim TEXT,
+        detalhes TEXT,
+        status TEXT NOT NULL DEFAULT 'ativa'
       )
     ''');
 
@@ -63,6 +67,35 @@ class ConexaoSqlite {
     await db.execute(
       'CREATE INDEX idx_diarios_obra_data ON diarios_obra(obra_id, data DESC)',
     );
+  }
+
+  /// Migração v1 → v2: ciclo de vida da obra (data de fim, observações do
+  /// engenheiro e status para fechar/arquivar o item).
+  static Future<void> migrar(
+    Database db,
+    int versaoAntigo,
+    int versaoNovo,
+  ) async {
+    if (versaoAntigo < 2) {
+      for (final coluna in [
+        'data_fim TEXT',
+        'detalhes TEXT',
+        "status TEXT NOT NULL DEFAULT 'ativa'",
+      ]) {
+        if (!await _temColuna(db, 'obras', coluna.split(' ').first)) {
+          await db.execute('ALTER TABLE obras ADD COLUMN $coluna');
+        }
+      }
+    }
+  }
+
+  static Future<bool> _temColuna(
+    Database db,
+    String tabela,
+    String coluna,
+  ) async {
+    final linhas = await db.rawQuery('PRAGMA table_info($tabela)');
+    return linhas.any((l) => l['name'] == coluna);
   }
 
   Future<void> fechar() => _db.close();

@@ -35,4 +35,18 @@ class DiariosDao {
         where: 'id = ?',
         whereArgs: [id],
       );
+
+  /// Corrige só a transcrição — os demais campos extraídos ficam intactos.
+  Future<void> atualizarTranscricao(String id, String texto) => _db.update(
+        'diarios_obra',
+        {'transcricao_raw': texto},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+  Future<void> excluir(String id) => _db.delete(
+        'diarios_obra',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
 }

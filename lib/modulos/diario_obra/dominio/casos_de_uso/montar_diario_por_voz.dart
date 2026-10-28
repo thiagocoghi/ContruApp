@@ -32,9 +32,11 @@ class MontarDiarioPorVoz {
     required String obraId,
     DateTime? agora,
   }) async {
+    // idioma 'auto': o whisper detecta sozinho o idioma falado em cada
+    // gravação, em vez de forçar PT-BR sobre qualquer fala.
     final texto = await transcritor.transcrever(
       caminhoAudio: caminhoAudio,
-      idioma: 'pt',
+      idioma: 'auto',
     );
 
     if (texto.isEmpty) {

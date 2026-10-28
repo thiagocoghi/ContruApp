@@ -4,9 +4,10 @@
 abstract interface class Transcritor {
   /// Transcreve um arquivo de áudio no dispositivo.
   ///
-  /// [idioma] usa códigos BCP-47 ('pt', 'en', 'auto'...).
+  /// [idioma] usa códigos BCP-47 ('pt', 'en'...) ou 'auto' para o whisper
+  /// detectar sozinho o idioma falado — que é o padrão.
   Future<String> transcrever({
     required String caminhoAudio,
-    String idioma = 'pt',
+    String idioma = 'auto',
   });
 }

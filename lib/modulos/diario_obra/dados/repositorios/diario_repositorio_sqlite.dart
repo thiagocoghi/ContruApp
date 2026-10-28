@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../../../../core/dados/banco_dados/daos/diarios_dao.dart';
 import '../../dominio/entidades/diario_obra.dart';
 import '../../dominio/repositorios/diario_repositorio.dart';
@@ -28,4 +30,31 @@ class DiarioRepositorioSqlite implements DiarioRepositorio {
   @override
   Future<void> registrarPdf({required String id, required String caminhoPdf}) =>
       _dao.atualizarPdf(id, caminhoPdf);
+
+  @override
+  Future<void> atualizarTranscricao({
+    required String id,
+    required String texto,
+  }) =>
+      _dao.atualizarTranscricao(id, texto);
+
+  @override
+  Future<void> excluir(DiarioObra diario) async {
+    final caminhoPdf = diario.pdfPath;
+    await _dao.excluir(diario.id);
+
+    // O PDF é artefato gerado a partir do RDO: apagado o relatório, some
+    // também. Arquivo já inexistente não deve derrubar a exclusão.
+    if (caminhoPdf != null) {
+      final arquivo = File(caminhoPdf);
+      if (await arquivo.exists()) {
+        try {
+          await arquivo.delete();
+        } on FileSystemException {
+          // O registro já saiu do banco; um PDF órfão não é motivo para
+          // falhar a operação que o usuário pediu.
+        }
+      }
+    }
+  }
 }

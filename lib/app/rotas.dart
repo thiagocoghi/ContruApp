@@ -13,6 +13,7 @@ import '../modulos/diario_obra/dominio/entidades/diario_obra.dart';
 /// Etapa 1 do roadmap (Seção 3 do PRD) ativa:
 /// - `/`                 → lista de obras
 /// - `/obra/nova`        → cadastro de obra
+/// - `/obra/editar`      → edição de obra (args: Obra)
 /// - `/obra/diarios`     → RDOs da obra (args: [Obra])
 /// - `/diario/nova`      → gravação por voz (args: [Obra])
 /// - `/diario/detalhe`   → detalhe do RDO (args: ({Obra, DiarioObra}))
@@ -23,7 +24,10 @@ Route<dynamic>? gerarRota(RouteSettings settings) {
     case '/':
       return MaterialPageRoute(builder: (_) => const TelaObras());
     case '/obra/nova':
-      return MaterialPageRoute(builder: (_) => const TelaCriarObra());
+      return MaterialPageRoute(builder: (_) => const TelaFormObra());
+    case '/obra/editar':
+      final obra = settings.arguments as Obra;
+      return MaterialPageRoute(builder: (_) => TelaFormObra(obra: obra));
     case '/obra/diarios':
       final obra = settings.arguments as Obra;
       return MaterialPageRoute(builder: (_) => TelaDiarios(obra: obra));

@@ -9,15 +9,19 @@ import '../../../modulos/diario_obra/dominio/interfaces/transcritor.dart';
 /// para Android/iOS/Windows. O modelo GGML é baixado uma única vez e fica
 /// em cache no dispositivo — depois disso a transcrição roda sem rede.
 class TranscritorWhisper implements Transcritor {
-  TranscritorWhisper({this.modelo = WhisperModel.tiny});
+  TranscritorWhisper({this.modelo = WhisperModel.base});
 
-  /// PRD: Whisper Tiny ou Base quantizado para PT-BR.
+  /// PRD: Whisper Base quantizado, multilíngue (PT-BR, EN, ES...).
+  ///
+  /// O Base substitui o Tiny porque o Tiny confunde palavras do dia a dia
+  /// do canteiro ("outubro" saía como "auctubro"). O download passa a ser
+  /// de ~142 MB na primeira execução, em vez de ~75 MB.
   final WhisperModel modelo;
 
   @override
   Future<String> transcrever({
     required String caminhoAudio,
-    String idioma = 'pt',
+    String idioma = 'auto',
   }) async {
     final controller = WhisperController();
 
@@ -28,6 +32,8 @@ class TranscritorWhisper implements Transcritor {
     final resultado = await controller.transcribe(
       model: modelo,
       audioPath: caminhoAudio,
+      // 'auto' deixa o próprio whisper.cpp detectar o idioma falado em cada
+      // gravação, em vez de forçar um código fixo.
       lang: idioma,
     );
     return (resultado?.transcription.text ?? '').trim();
@@ -39,7 +45,7 @@ class TranscritorWhisper implements Transcritor {
       await controller.downloadModel(modelo);
     } on Exception catch (erro) {
       throw FalhaDominio(
-        'O modelo de transcrição (~75 MB) ainda não está no aparelho e não '
+        'O modelo de transcrição (~142 MB) ainda não está no aparelho e não '
         'foi possível baixá-lo agora. Conecte-se à internet e tente '
         'novamente. Detalhe: $erro',
       );

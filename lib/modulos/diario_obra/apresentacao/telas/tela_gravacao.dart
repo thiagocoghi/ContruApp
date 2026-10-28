@@ -182,7 +182,7 @@ class _TelaProcessando extends StatelessWidget {
             SizedBox(height: 24),
             Text(
               'Transcrevendo no dispositivo...\n'
-              'Na primeira vez o modelo de voz é baixado (≈75 MB).',
+              'Na primeira vez o modelo de voz é baixado (≈142 MB).',
               textAlign: TextAlign.center,
             ),
           ],

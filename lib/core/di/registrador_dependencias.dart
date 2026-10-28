@@ -20,6 +20,8 @@ import '../dados/banco_dados/daos/obras_dao.dart';
 import '../dados/repositorios/obra_repositorio_sqlite.dart';
 import '../dominio/casos_de_uso/criar_obra.dart';
 import '../dominio/repositorios/obra_repositorio.dart';
+export '../dominio/casos_de_uso/criar_obra.dart'
+    show EditarObra, FecharObra, ReabrirObra, AlternarArquivamento, ExcluirObra;
 
 /// Composição raiz das dependências (banco local, repositórios, motor de IA).
 ///
@@ -63,6 +65,17 @@ class RegistrarDependencias {
   /// Casos de uso dependentes de estado.
   CriarObra get criarObra => CriarObra(obras);
 
+  EditarObra get editarObra => EditarObra(obras);
+
+  FecharObra get fecharObra => FecharObra(obras);
+
+  ReabrirObra get reabrirObra => ReabrirObra(obras);
+
+  AlternarArquivamento get alternarArquivamento =>
+      AlternarArquivamento(obras);
+
+  ExcluirObra get excluirObra => ExcluirObra(obras);
+
   MontarDiarioPorVoz get montarDiarioPorVoz => MontarDiarioPorVoz(
         transcritor: transcritor,
         extrator: extrator,
@@ -104,6 +117,11 @@ class RegistrarDependencias {
           create: (_) => ObrasCubit(
             repositorio: obras,
             criarObra: criarObra,
+            editarObra: editarObra,
+            fecharObra: fecharObra,
+            reabrirObra: reabrirObra,
+            alternarArquivamento: alternarArquivamento,
+            excluirObra: excluirObra,
           )..carregar(),
         ),
         BlocProvider<PreparacaoIaCubit>(

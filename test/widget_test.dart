@@ -16,10 +16,22 @@ class _ObraRepositorioVazio implements ObraRepositorio {
   Future<List<Obra>> listar() async => const [];
 
   @override
+  Future<List<Obra>> listarAtivas() async => const [];
+
+  @override
+  Future<List<Obra>> listarArquivadas() async => const [];
+
+  @override
   Future<Obra?> porId(String id) async => null;
 
   @override
   Future<void> salvar(Obra obra) async {}
+
+  @override
+  Future<void> atualizar(Obra obra) async {}
+
+  @override
+  Future<void> excluir(String id) async {}
 }
 
 /// SLM falso que nunca fica pronto — o smoke test não pode baixar modelo.
@@ -53,6 +65,11 @@ void main() {
             create: (_) => ObrasCubit(
               repositorio: repositorio,
               criarObra: CriarObra(repositorio),
+              editarObra: EditarObra(repositorio),
+              fecharObra: FecharObra(repositorio),
+              reabrirObra: ReabrirObra(repositorio),
+              alternarArquivamento: AlternarArquivamento(repositorio),
+              excluirObra: ExcluirObra(repositorio),
             )..carregar(),
           ),
           // Sem iniciar(): o teste não dispara o download do modelo.
